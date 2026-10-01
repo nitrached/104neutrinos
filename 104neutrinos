@@ -1,0 +1,99 @@
+#!/usr/bin/python3
+import sys
+from math import sqrt
+
+def convert_to_int(input_str):
+    try:
+        result = int(input_str)
+    except ValueError:
+        print("Error: Please enter a valid integer.")
+        sys.exit(84)
+    return result
+
+def show_help():
+    print("Usage\n   ./104neutrinos n a h sd\n")
+    print("DESCRIPTION")
+    print("    n       number of values\n    a       arithmetic mean\n    h       harmonic mean\n    sd      standard deviation")
+    sys.exit(0)
+
+def parse_arguments():
+    if len(sys.argv) != 5:
+        if len(sys.argv) == 2 and (sys.argv[1] == "-h" or sys.argv[1] == "--help"):
+            show_help()
+        print("Error: Incorrect number of arguments.")
+        sys.exit(84)
+
+    nb = convert_to_int(sys.argv[1])
+    arithm_mean = convert_to_int(sys.argv[2])
+    harmo_mean = convert_to_int(sys.argv[3])
+    std_dev = convert_to_int(sys.argv[4])
+
+    if harmo_mean <= 0 or std_dev < 0 or nb < 0:
+        print("Error: Invalid input values.")
+        sys.exit(84)
+
+    return nb, arithm_mean, harmo_mean, std_dev
+
+def get_next_value_from_user():
+    print("Enter the next value:", end=' ', flush=True)
+    user_input = sys.stdin.readline()
+
+    if user_input == "END\n":
+        sys.exit(0)
+
+    try:
+        value = int(user_input)
+    except ValueError:
+        print("Error: Please enter a valid integer.")
+        sys.exit(84)
+
+    return value
+
+def display_number_of_values(count):
+    print(f"    Number of values:\t{count}")
+
+def calculate_and_display_std_dev(value, count, arithm_mean, std_dev):
+    square_sum = (pow(std_dev, 2) + pow(arithm_mean, 2)) * count
+    tmp_mean = (arithm_mean * count + value) / (count + 1)
+    new_std_dev = sqrt(((square_sum + pow(value, 2)) / (count + 1)) - pow(tmp_mean, 2))
+    print(f"    Standard deviation:\t{new_std_dev:.2f}")
+    return new_std_dev
+
+def calculate_and_display_arithm_mean(value, count, arithm_mean):
+    new_arithm_mean = (arithm_mean * count + value) / (count + 1)
+    print(f"    Arithmetic mean:\t{new_arithm_mean:.2f}")
+    return new_arithm_mean
+
+def calculate_and_display_quadri_mean(value, count, arithm_mean, std_dev):
+    square_sum = (pow(std_dev, 2) + pow(arithm_mean, 2)) * (count + 1)
+    moy_quadra = sqrt(square_sum / (count + 1))
+    print(f"    Root mean square:\t{moy_quadra:.2f}")
+
+def calculate_and_display_harmo_mean(value, count, harmo_mean):
+    if (harmo_mean == 0):
+        sys.exit(84)
+    if value == 0:
+        sys.exit(84)
+    somme_inv = count / harmo_mean
+    if somme_inv == 0:
+        sys.exit(84)
+    if (somme_inv + (1 / value)) == 0:
+        sys.exit(84)
+    new_harmo_mean = (count + 1) / (somme_inv + (1 / value))
+    print(f"    Harmonic mean:\t{new_harmo_mean:.2f}")
+    return new_harmo_mean
+
+if __name__ == "__main__":
+    count, arithm_mean, harmo_mean, std_dev = parse_arguments()
+
+    while True:
+        value = get_next_value_from_user()
+        if value == 0:
+            sys.exit(84)
+        display_number_of_values(count + 1)
+        std_dev = calculate_and_display_std_dev(value, count, arithm_mean, std_dev)
+        arithm_mean = calculate_and_display_arithm_mean(value, count, arithm_mean)
+        calculate_and_display_quadri_mean(value, count, arithm_mean, std_dev)
+        harmo_mean = calculate_and_display_harmo_mean(value, count, harmo_mean)
+        print()
+        count += 1
